@@ -24,13 +24,22 @@ def dl_mp3(id, target_folder = './'):
     for char in invalid:
         fname = fname.replace(char, "_")
     sound_url = re.findall(r"soundurl\":\"(.*?)\"", json_content)[0]
-    if not os.path.exists(target_folder):
-        os.mkdir(target_folder)
-    mp3_stream = requests.get(sound_url, headers = headers)
+    
     if target_folder != './':
         path = target_folder + '/' + fname
     else:
         path = './' + fname
+    if not os.path.exists(target_folder):
+        os.mkdir(target_folder)
+    try:
+        with open(path, 'r') as f:
+            print(fname + " 跳过 " + target_folder)
+            return
+    except FileNotFoundError:
+        pass
+
+    mp3_stream = requests.get(sound_url, headers = headers)
+
     with open(path, 'wb') as f:
         f.write(mp3_stream.content)
     print(fname + " downloaded in folder " + target_folder)
